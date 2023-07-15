@@ -1,77 +1,59 @@
 # ScratchpadPlus
-Fork de Scratchpad avec création automatique de WPT
+A fork of Scratchpad with automatic creation of WPT
 
 ## Installation
 
-L'installation et l'utilisation se fait de la même manière que pour Scratchpad voir ici : https://github.com/rkusa/dcs-scratchpad
+The installation and usage are done in the same way as Scratchpad, see here: https://github.com/rkusa/dcs-scratchpad
 
-## Lancement
-L'ouverture du logiciel se fait par défaut via le raccourci : ctrl+shift+w
+## Launch
+The software is opened by default via the shortcut: ctrl+shift+w
 
-## Création de WPT
+## Creation of WPT
 
-Lors de la prise d'une coordonnée, une nouvelle ligne commençant par un astérique apparait : c'est la ligne qui sera insérée dans l'ordinateur de bord. 
-Si on ne souhaite pas intégrer une coordonnée, il suffit de supprimer l'astérisque.
+When taking a coordinate, a new line starting with an asterisk appears: this is the line that will be inserted into the onboard computer. 
+If you do not want to integrate a coordinate, simply delete the asterisk.
 
-ATTENTION : s'il existe des WPT, ils seront écrasés
-
-
-#### F18 : 
-
-- dans HSI>DATA, boxer "Precise" 
-- au niveau de l'AMPCD : Afficher n'importe quelle page, SAUF la page "TAC"
-- cliquer sur "insert" et attendre 
+WARNING: if there are WPTs, they will be overwritten
 
 
-#### A10 : 
+#### F/A-18C: 
 
-- il est possible de nommer un WPT, pour cela ajouter le nom juste après l'astérique et avant le premier '|'.
+- in HSI>DATA, box "Precise" 
+- at the AMPCD level: Display any page, EXCEPT the "TAC" page
+- click on "Load all" and wait 
 
-	ex : *|N 41°55.590'|E 044°10.440'|3140 => *T90|N 41°55.590'|E 044°10.440'|3140  => le WPT aura pour nom "T90"
 
-- aller sur l'écran CDU, Page WPT
-- cliquer sur "insert" et attendre
+#### A10: 
 
-- Remarque : L'A10 ne permet de rentrer que 50 WPT, une fois cette limite atteinte, il est nécessaire de modifier les WPT déjà créés. Pour indiquer à ScratchpadPlus qu'il doit modifier les WPT, il faut insérer un # au niveau de la première ligne de ScratchpadPlus. 
+- it is possible to name a WPT, to do this add the name just after the asterisk and before the first '|'.
 
-#### M2000 :
+    example: *|N 41°55.590'|E 044°10.440'|3140 => *T90|N 41°55.590'|E 044°10.440'|3140  => the WPT will be named "T90"
 
--cliquer simplement sur "insert"
-	
+- go to the CDU screen, WPT Page
+- click on "Load all" and wait
 
-#### F16 : 
+- Note: The A10 only allows for 50 WPTs to be entered, once this limit is reached, it is necessary to modify the already created WPTs. To indicate to ScratchpadPlus that it should modify the WPTs, insert a # at the first line of ScratchpadPlus. 
 
-- -cliquer simplement sur "insert"
+#### M2000:
+
+- simply click on "Load all"
+    
+
+#### F-16C: 
+
+- simply click on "Load all"
 
 ##
-NB : si vous ajoutez une coordonnée dans scratchpad et que vous avez déjà inséré les autres, l'ensemble des coordonnées seront de nouveau insérées dans l'ordinateur de bord, il faut donc soit effacer les coordonnées précédentes, soit retirer l'astérisque
+NB : if you add a coordinate in scratchpad and you have already inserted the others, all the coordinates will be reinserted into the onboard computer, so you must either erase the previous coordinates, or remove the asterisk
 
 
-#### F15E
+#### F-15E:
 
-Phase de TEST, le fonctionnement décrit ci-après peut fortement changer à court terme. 
+Since there is no next waypoint function on the F-15E, we must load all the waypoints at once using their respective waypoint numbers.
 
-Pour le F15E, le programme fonctionne différemment du fait que la création de WPT dans cet appareil est particulier. En effet il est nécessaire de saisir manuellement le numro du WPT à créer (impossible de faire +1) et pour avoir un WPT d'attaque, il faut créer des targets points (numéro de WPT suivi d'un point). Hors en cas de présence d'un target point, il n'est plus possible d'éditer le WPT (sans numéro) initial, car il n'existe plus. 
+- Add all the waypoints for the route you want to enter. To specify target points, add a period (`.`) after the appropriate waypoint number(s) in the text box (example: `*|N 41°55.590'|E 044°10.440'|3140|5.` means that waypoint 5 will be a target point).
 
-Ces différentes contraintes expliquent le fonctionnement suivant : 
+- Click "Load all" and the waypoints will be entered and configured as the appropriate type into route B.
 
-- faites un 'clear' du logiciel => obligatoire !
-- prennez vos WPT comme d'habitude
-- Placez vous sur le menu (cf image ci-après)
-- Cliquer sur insert
-
-Le programme va alors :
- - insérer les WPT en partant de 1 ~~et les modifier en target point~~ (plus valable à partir de la 1.3)
- - utiliser le canal B afin de conserver toute route qui serait créées dans A (ATTENTION : B ne doit donc pas être utilisé)
- - A partir de la version 1.3 : si un point est ajouté manuellement entre * et | alors le WPT sera transformé en Target Point. (ex *.|N 41°55.590'|E 044°10.440'|3140|1 => le WPT 1B sera converti en 1.B)
- - A partir de la version 1.4 : si un point est ajouté comme tout premier caractère de la fenetre de saisie, alors l'ensemble des wayponts seront convertis en target point
-
-L'impossibilité d'éditer automatiquement un WPT une fois ce dernier passer en target point fait que le programme fera +1 pour chaque WPT, tant que DCS ne sera pas redémarré. 
-Pour le forcer à revenir à 1, il faut ajouter, juste avant le premier 'insert', le caratère # au niveau de la première ligne de ScratchpadPlus. 
-
-![image](https://github.com/docbrownd/ScratchpadPlus/assets/105074220/aa1a5550-6345-49af-bb9a-9c86730bfcad)
-
-
-
-
+Note that since we can't tell if any previously entered waypoint is a steerpoint or a target point, a longer sequence of key presses is used to guarantee we get the desired type of waypoint.
 
