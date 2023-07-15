@@ -3,7 +3,9 @@ A fork of Scratchpad with automatic creation of WPT
 
 ## Installation
 
-The installation and usage are done in the same way as Scratchpad, see here: https://github.com/rkusa/dcs-scratchpad
+The installation and usage are done in the same way as Scratchpad (https://github.com/rkusa/dcs-scratchpad).
+
+Copy the `Scripts` folder into your `%userprofile%\Saved Games\DCS` folder.
 
 ## Launch
 The software is opened by default via the shortcut: ctrl+shift+w
