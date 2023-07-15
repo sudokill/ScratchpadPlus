@@ -23,8 +23,6 @@ local textarea = nil
 local logFile = io.open(lfs.writedir() .. [[Logs\ScratchpadPlus.log]], "w")
 local config = nil
 
-local f15Number = 0
-
 local panel = nil
 local textarea = nil
 local crosshairCheckbox = nil
@@ -376,29 +374,41 @@ function loadInF15E()
         ['A'] = "3020",
         ['B'] = "3022",
         ['C'] = "3032",
-        
-}
+    }
 
     local commande = {
-        ['accessSTR'] = "3010",
+        ['accessSTR'] = "3010", -- PB0
         ['shift'] = "3033", 
-        ["changeWPT"] = "3001",
+        ["changeWPT"] = "3001", -- PB1
         ["addToLat"] = "3002",
         ["addToLong"] = "3003",
         ["addToAlt"] = "3007",
         ["north"] = "3021",
         ["south"] = "3031",
         ["east"] = "3027",
-        ["west"] = "3025"
+        ["west"] = "3025",
+        ["clear"] = "3035",
+        ["menu"] = "3038",
     }
 
 
     DatasPlane = {}
 
-    if (insertA10withWPT) then 
-        f15Number = 0
-    end
+    -- Get into first menu page from any UFC state (including anything in UFC scratch pad)
+    clicOn(deviceF15, commande.clear, F15TimePress)
+    clicOn(deviceF15, commande.clear, F15TimePress)
+    clicOn(deviceF15, commande.clear, F15TimePress)
+    clicOn(deviceF15, commande.clear, F15TimePress)
+    clicOn(deviceF15, commande.menu, F15TimePress)
 
+    -- Make sure we aren't currently on any B steerpoints
+    local position = 1
+    clicOn(deviceF15, correspondances[position+1],F15TimePress)
+    clicOn(deviceF15, commande.shift,F15TimePress)
+    clicOn(deviceF15, textCorrepondance["A"],F15TimePress)
+    clicOn(deviceF15, commande.accessSTR, F15TimePress)
+
+    -- Enter steerpoint page
     clicOn(deviceF15, commande.accessSTR, F15TimePress)
 
     
@@ -406,32 +416,103 @@ function loadInF15E()
     for i, v in ipairs(globalCoords) do
         local wptPosition = v["wptPosition"]
 
-        if (insertA10withWPT) then 
-            f15Number = f15Number + 1
-            wptPosition = tostring(f15Number)
-        end
-     
+        -- We can't tell if an existing waypoint is a steerpoint or a target point,
+        -- so we'll use a longer sequence of keypresses to clear any UFC scratchpad
+        -- errors and force the waypoint into the desired type
+        local isTargetpoint = false   -- string.find(wptPosition, "%.")
         for ii, vv in ipairs(wptPosition) do 
-            if (vv == ".") then 
-                clicOn(deviceF15, "3029",F15TimePress) -- targetpoint (dot)
-            else 
+            if vv == "." then 
+                isTargetpoint = true
+                break
+            end
+        end
+        if isTargetpoint then
+            -- For a target point, we'll enter #B, PB1, 0, 0, CLR, CLR, #.B, PB1
+
+            -- enter waypoint digits
+            for ii, vv in ipairs(wptPosition) do 
                 local position = tonumber(vv)
-                if position ~=nil then 
-                    position = position+1
-                    if (correspondances[position] ~= nil) then 
-                        clicOn(deviceF15,correspondances[position],F15TimePress)
+                if position ~= nil then 
+                    local index = position + 1
+                    if (correspondances[index] ~= nil) then 
+                        clicOn(deviceF15,correspondances[index],F15TimePress)
                     end
                 end
             end
+            -- route B
+            clicOn(deviceF15, commande.shift,F15TimePress)
+            clicOn(deviceF15, textCorrepondance["B"],F15TimePress)
+
+            -- attempt to select waypoint
+            clicOn(deviceF15, commande.changeWPT, F15TimePress) -- press PB1
+
+            -- clear any errors
+            clicOn(deviceF15, correspondances[1], F15TimePress) -- press 0
+            clicOn(deviceF15, correspondances[1], F15TimePress) -- press 0
+            clicOn(deviceF15, commande.clear, F15TimePress)     -- press CLR
+            clicOn(deviceF15, commande.clear, F15TimePress)     -- press CLR
+
+            -- enter waypoint digits
+            for ii, vv in ipairs(wptPosition) do 
+                local position = tonumber(vv)
+                if position ~= nil then 
+                    local index = position + 1
+                    if (correspondances[index] ~= nil) then 
+                        clicOn(deviceF15,correspondances[index],F15TimePress)
+                    end
+                end
+            end
+            -- select target point
+            clicOn(deviceF15, "3029",F15TimePress) -- targetpoint (dot)
+            -- route B
+            clicOn(deviceF15, commande.shift,F15TimePress)
+            clicOn(deviceF15, textCorrepondance["B"],F15TimePress)
+            -- select waypoint (should always work)
+            clicOn(deviceF15, commande.changeWPT, F15TimePress) -- press PB1
+        else
+            -- For a steerpoint, we'll enter #.B, PB1, 0, 0, CLR, CLR, #B, PB1
+
+            -- enter waypoint digits
+            for ii, vv in ipairs(wptPosition) do 
+                local position = tonumber(vv)
+                if position ~= nil then 
+                    local index = position + 1
+                    if (correspondances[index] ~= nil) then 
+                        clicOn(deviceF15,correspondances[index],F15TimePress)
+                    end
+                end
+            end
+            -- select target point
+            clicOn(deviceF15, "3029",F15TimePress) -- targetpoint (dot)
+            -- route B
+            clicOn(deviceF15, commande.shift,F15TimePress)
+            clicOn(deviceF15, textCorrepondance["B"],F15TimePress)
+
+            -- attempt to select waypoint
+            clicOn(deviceF15, commande.changeWPT, F15TimePress) -- press PB1
+
+            -- clear any errors
+            clicOn(deviceF15, correspondances[1], F15TimePress) -- press 0
+            clicOn(deviceF15, correspondances[1], F15TimePress) -- press 0
+            clicOn(deviceF15, commande.clear, F15TimePress)     -- press CLR
+            clicOn(deviceF15, commande.clear, F15TimePress)     -- press CLR
+
+            -- enter waypoint digits
+            for ii, vv in ipairs(wptPosition) do 
+                local position = tonumber(vv)
+                if position ~= nil then 
+                    local index = position + 1
+                    if (correspondances[index] ~= nil) then 
+                        clicOn(deviceF15,correspondances[index],F15TimePress)
+                    end
+                end
+            end
+            -- route B
+            clicOn(deviceF15, commande.shift,F15TimePress)
+            clicOn(deviceF15, textCorrepondance["B"],F15TimePress)
+            -- select waypoint (should always work)
+            clicOn(deviceF15, commande.changeWPT, F15TimePress) -- press PB1
         end
-   
-
-
-        clicOn(deviceF15, commande.shift,F15TimePress)
-        clicOn(deviceF15, textCorrepondance["B"],F15TimePress)
-
-        clicOn(deviceF15, commande.changeWPT, F15TimePress)
-
 
         local indexCoords = {
             "lat","long", 'alt'
@@ -472,29 +553,10 @@ function loadInF15E()
                 clicOn(deviceF15, commande.addToAlt,F15TimePress)
             end
         end
-
-    
-   
-        if (makeAllTargetPont or (v["wptName"] ~= nil and v["wptName"][2] == ".")) then
-            for ii, vv in ipairs(wptPosition) do 
-                local position = tonumber(vv)
-                if position ~=nil then 
-                    position = position+1
-                    if (correspondances[position] ~= nil) then 
-                        clicOn(deviceF15,correspondances[position],F15TimePress)
-                    end
-                end
-            end
-
-            clicOn(deviceF15, "3029",F15TimePress) -- targetpoint (dot)
-            clicOn(deviceF15, commande.shift,F15TimePress)
-            clicOn(deviceF15, textCorrepondance["B"],F15TimePress)
-            clicOn(deviceF15, commande.changeWPT, F15TimePress)
-        
-        end
-        
     end
 
+    -- back to first menu page
+    clicOn(deviceF15, commande.menu, F15TimePress)
 
     insertA10withWPT = false
     
@@ -881,21 +943,7 @@ function loadScratchpad()
 
     function addText(msg)
         local text = textarea:getText()
-        local lineCountBefore = textarea:getLineCount()
-        local _lineBegin, _indexBegin, lineEnd, _indexEnd = textarea:getSelectionNew()
-        local offset = 0
-        for i = 0, lineEnd do
-            offset = string.find(text, "\n", offset + 1, true)
-            if offset == nil then
-                offset = string.len(text)
-                break
-            end
-        end
-        textarea:setText(string.sub(text, 1, offset - 1) .. msg .. string.sub(text, offset + 1, string.len(text)))
-        local lineCountAdded = textarea:getLineCount() - lineCountBefore
-        local line = lineEnd + lineCountAdded - 1
-        textarea:setSelectionNew(line, 0, line, 0)
-
+        textarea:setText(text .. msg)
     end
 
     function addValToGlobal(lat, long, alt, wptName, wptPosition)
@@ -998,35 +1046,19 @@ function loadScratchpad()
         local mgrs = Terrain.GetMGRScoordinates(pos.x, pos.z)
         local type, includeMgrs = coordsType()
 
-        local result = "\n\n"
-        if type == nil or type == "DMS" then
-            result = result .. formatCoord("DMS", true, lat) .. ", " .. formatCoord("DMS", false, lon) .. "\n"
-        end
-        if type == nil or type == "DDM" then
-            result = result .. formatCoord("DDM", true, lat) .. ", " .. formatCoord("DDM", false, lon) .. "\n"
-        end
-        if type == nil or includeMgrs then
-            result = result .. mgrs .. "\n"
-        end
-        result = result .. string.format("%.0f", alt) .. "m, ".. string.format("%.0f", alt*3.28084) .. "ft\n"
-
-        local addOnF15 = ""
-
         local AirplaneType = DCS.getPlayerUnitType()
 
-        -- if (AirplaneType == "F-15ESE") then 
-        f15Number = f15Number + 1
-        addOnF15 = tostring(f15Number)
-        -- saveConfiguration()
-        -- end
-
-        result = result .. "*|".. formatCoord("DDM", true, lat).. "|" .. formatCoord("DDM", false, lon) .."|" .. string.format("%.0f", alt*3.28084).. "|" .. addOnF15 .. "\n\n"
-
+        local text = textarea:getText()
+        local count = 0
+        for line in text:gmatch("[^\r\n]*") do
+            if line:sub(1, 1) == "*" then
+                count = count + 1
+            end
+        end
+        local wpt = tostring(count + 1)
+        local result = "*|" .. formatCoord("DDM", true, lat) .. "|" .. formatCoord("DDM", false, lon) .. "|" .. string.format("%.0f", alt*3.28084) .. "|" .. wpt .. "\n"
   
         addText(result)
-
-
-
 
 
         insertInPlane:setVisible(true)
