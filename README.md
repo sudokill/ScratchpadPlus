@@ -8,21 +8,21 @@ The installation and usage are done in the same way as Scratchpad (https://githu
 Copy the `Scripts` folder into your `%userprofile%\Saved Games\DCS` folder.
 
 ## Launch
-The software is opened by default via the shortcut: ctrl+shift+w
+The software is opened by default via the shortcut: CTRL+SHIFT+W
 
 ## Creation of WPT
 
-When taking a coordinate, a new line starting with an asterisk appears: this is the line that will be inserted into the onboard computer. 
-If you do not want to integrate a coordinate, simply delete the asterisk.
+When making a coordinate, a new line starting with an asterisk appears; this is the line that will be inserted into the onboard computer. 
+If you do not want to integrate the coordinates, delete the asterisk.
 
-WARNING: if there are WPTs, they will be overwritten
+WARNING: Set your current waypoint to a blank entry. Data will be overwritten.
 
 
 #### F/A-18C: 
 
-- in HSI>DATA, box "Precise" 
+- in HSI>DATA, box "PRECISE" 
 - at the AMPCD level: Display any page, EXCEPT the "TAC" page
-- click on "Load all" and wait 
+- click on "Load all"
 
 
 #### A10: 
@@ -32,7 +32,7 @@ WARNING: if there are WPTs, they will be overwritten
     example: *|N 41°55.590'|E 044°10.440'|3140 => *T90|N 41°55.590'|E 044°10.440'|3140  => the WPT will be named "T90"
 
 - go to the CDU screen, WPT Page
-- click on "Load all" and wait
+- click on "Load all"
 
 - Note: The A10 only allows for 50 WPTs to be entered, once this limit is reached, it is necessary to modify the already created WPTs. To indicate to ScratchpadPlus that it should modify the WPTs, insert a # at the first line of ScratchpadPlus. 
 
